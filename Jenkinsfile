@@ -1,24 +1,24 @@
-node('built-in') 
+node("built-in")
 {
-    stage('ContinuousDownlod') 
+    stage("download")
     {
-        git 'https://github.com/IntelliqDevops/maven.git'
+        git 'https://github.com/Sandeeppappula/maven.git'
     }
-    stage('ContinuousBuild') 
+    stage("build")
     {
         sh 'mvn package'
     }
-    stage('Deployment') 
+    stage("deploy")
     {
-        deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: '36ae92a4-5d2c-4e85-af95-1d9479531187', path: '', url: 'http://172.31.8.161:8080')], contextPath: 'testapp', war: '**/*.war'
+        sh 'scp /var/lib/jenkins/workspace/demo/webapp/target/webapp.war ubuntu@172.31.8.161:/var/lib/tomcat10/test2'
     }
-    stage('ContinuousTesting') 
+    stage("testing")
     {
-        git 'https://github.com/IntelliqDevops/FunctionalTesting.git'
-        sh 'java -jar /var/lib/jenkins/workspace/scriptedpipeline1/testing.jar'
+        git 'https://github.com/Sandeeppappula/FunctionalTesting.git'
+        sh 'java -jar /var/lib/jenkins/workspace/DemoScriptedPipeline/testing.jar'
     }
-    stage('ContinuousDelivery') 
+    stage("delivery")
     {
-       deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: '36ae92a4-5d2c-4e85-af95-1d9479531187', path: '', url: 'http://172.31.3.43:8080')], contextPath: 'prodapp', war: '**/*.war'
+        sh 'scp /var/lib/jenkins/workspace/DemoScriptedPipeline/webapp/target/webapp.war ubuntu@172.31.3.43:/var/lib/tomcat10/prod2'
     }
 }
